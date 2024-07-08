@@ -116,7 +116,7 @@ const IndexPage: React.FC<PageProps> = () => {
 
     React.useEffect(() => {
         fetch(
-            "https://raw.githubusercontent.com/syrflover/syrflover/master/transmission-rss-channels.yaml"
+            `https://raw.githubusercontent.com/syrflover/syrflover/master/transmission-rss-channels.yaml?v=${currentDateTime.getTime()}`
         )
             .then((resp) => resp.text())
             .then((text) => {
