@@ -255,7 +255,7 @@ const IndexPage: React.FC<PageProps> = () => {
                 setChannels(channels);
 
                 setTimeout(() => {
-                    selectDay(currentDateTime.getDay() + 4);
+                    selectDay(currentDateTime.getDay());
                 }, 5);
             });
     }, []);
