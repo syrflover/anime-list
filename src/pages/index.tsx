@@ -1,6 +1,8 @@
 import * as React from "react";
 import type { HeadFC, PageProps } from "gatsby";
-import YAML from "yaml";
+import { parseChannels } from "../channel/parseChannels";
+import { Channel } from "../channel";
+import { dayToNumber, dayToString } from "../utils";
 
 const pageStyles: React.CSSProperties = {
     color: "#232129",
@@ -80,66 +82,6 @@ const linkStyles: React.CSSProperties = {
     margin: "4px 0",
 };
 
-type Channel = {
-    url: string;
-    rules: {
-        // year, quarter
-        quarter: [number, number];
-        day: string;
-        time: string;
-        translator: string;
-        anissiaUrl: string;
-        match: string;
-    }[];
-};
-
-const dayToNumber = (x: string) => {
-    switch (x) {
-        case "Mon":
-            return 1;
-
-        case "Tue":
-            return 2;
-
-        case "Wed":
-            return 3;
-
-        case "Thu":
-            return 4;
-
-        case "Fri":
-            return 5;
-
-        case "Sat":
-            return 6;
-
-        case "Sun":
-            return 0;
-
-        default:
-            return -1;
-    }
-};
-
-const dayToString = (x: number) => {
-    switch (x) {
-        case 0:
-            return "Sun";
-        case 1:
-            return "Mon";
-        case 2:
-            return "Tue";
-        case 3:
-            return "Wed";
-        case 4:
-            return "Thu";
-        case 5:
-            return "Fri";
-        case 6:
-            return "Sat";
-    }
-};
-
 const IndexPage: React.FC<PageProps> = () => {
     const [currentDateTime, setCurrentDateTime] = React.useState(
         new Date()
@@ -153,102 +95,7 @@ const IndexPage: React.FC<PageProps> = () => {
         )
             .then((resp) => resp.text())
             .then((text) => {
-                const channels: Channel[] = YAML.parse(text);
-
-                console.log(channels);
-
-                const lines = text
-                    .split("\n")
-                    .map((line) => line.trim())
-                    .filter((line) => line.length > 0);
-
-                let currentQuarter = "";
-                let currentIndex = [0, 0];
-
-                for (let line of lines) {
-                    let rules = channels[currentIndex[0]].rules;
-                    let rule = rules[currentIndex[1]];
-
-                    if (currentIndex[1] > rules.length - 1) {
-                        currentIndex[0] += 1;
-                        currentIndex[1] = 0;
-
-                        rules = channels[currentIndex[0]].rules;
-                        rule = rules[currentIndex[1]];
-                    }
-
-                    if (
-                        [
-                            "quarter",
-                            "day",
-                            "time",
-                            "translator",
-                            "anissiaUrl",
-                        ].every(
-                            (key) =>
-                                rule[key as keyof Channel["rules"][0]]
-                                    ?.length > 0
-                        )
-                    ) {
-                        if (currentIndex[1] < rules.length - 1) {
-                            currentIndex[1] += 1;
-
-                            rule = rules[currentIndex[1]];
-                        } else {
-                            continue;
-                        }
-                    }
-
-                    if (line.startsWith("# - match: ")) {
-                        rule.anissiaUrl = "";
-
-                        continue;
-                    }
-
-                    if (line.startsWith("#")) {
-                        line = line.replace("#", "").trim();
-
-                        if (line.length === 0) {
-                            continue;
-                        }
-                    } else {
-                        continue;
-                    }
-
-                    console.log(line, currentIndex);
-
-                    if (line.startsWith("Q.")) {
-                        currentQuarter = line.replace("Q.", "").trim();
-                    }
-
-                    if (
-                        [
-                            "Mon.",
-                            "Tue.",
-                            "Wed.",
-                            "Thu.",
-                            "Fri.",
-                            "Sat.",
-                            "Sun.",
-                        ].some((day) => line.startsWith(day))
-                    ) {
-                        let [day, time, translator] = line
-                            .split(".")
-                            .map((x) => x.trim());
-
-                        rule.quarter = currentQuarter
-                            .split("/")
-                            .map((x) => parseInt(x)) as [number, number];
-
-                        rule.day = day;
-                        rule.time = time;
-                        rule.translator = translator;
-                    }
-
-                    if (line.startsWith("https://anissia.net/")) {
-                        rule.anissiaUrl = line;
-                    }
-                }
+                const channels = parseChannels(text);
 
                 console.log(channels);
 
@@ -338,8 +185,8 @@ const IndexPage: React.FC<PageProps> = () => {
                     style={{
                         ...listStyles,
                         maxHeight: "calc(100dvh - 228px)",
-                        // maxHeight: "auto",
                         overflowY: "auto",
+                        borderRadius: "16px",
                     }}
                 >
                     {channels
