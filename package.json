@@ -1,0 +1,30 @@
+{
+    "name": "anime",
+    "version": "1.0.0",
+    "private": true,
+    "description": "anime",
+    "author": "syr",
+    "keywords": [
+        "gatsby"
+    ],
+    "scripts": {
+        "dev": "gatsby develop --host 0.0.0.0 --port 8000",
+        "start": "gatsby develop --host 0.0.0.0 --port 8000",
+        "build": "gatsby build",
+        "serve": "gatsby serve",
+        "clean": "gatsby clean",
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "gatsby": "^5.13.5",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "yaml": "^2.4.5"
+    },
+    "devDependencies": {
+        "@types/node": "^20.11.19",
+        "@types/react": "^18.2.55",
+        "@types/react-dom": "^18.2.19",
+        "typescript": "^5.3.3"
+    }
+}
