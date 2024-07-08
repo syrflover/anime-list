@@ -121,14 +121,31 @@ const dayToNumber = (x: string) => {
     }
 };
 
+const dayToString = (x: number) => {
+    switch (x) {
+        case 0:
+            return "Sun";
+        case 1:
+            return "Mon";
+        case 2:
+            return "Tue";
+        case 3:
+            return "Wed";
+        case 4:
+            return "Thu";
+        case 5:
+            return "Fri";
+        case 6:
+            return "Sat";
+    }
+};
+
 const IndexPage: React.FC<PageProps> = () => {
     const [currentDateTime, setCurrentDateTime] = React.useState(
         new Date()
     );
     const [channels, setChannels] = React.useState<Channel[]>([]);
-    const [selectedDay, selectDay] = React.useState(
-        currentDateTime.getDay()
-    );
+    const [selectedDay, selectDay] = React.useState(-1);
 
     React.useEffect(() => {
         fetch(
@@ -236,8 +253,22 @@ const IndexPage: React.FC<PageProps> = () => {
                 console.log(channels);
 
                 setChannels(channels);
+
+                setTimeout(() => {
+                    selectDay(currentDateTime.getDay() + 4);
+                }, 5);
             });
     }, []);
+
+    React.useEffect(() => {
+        const day = dayToString(selectedDay);
+
+        if (day) {
+            document.getElementsByClassName(day).item(0)?.scrollIntoView({
+                behavior: "smooth",
+            });
+        }
+    }, [selectedDay]);
 
     return (
         <main style={pageStyles}>
@@ -293,12 +324,6 @@ const IndexPage: React.FC<PageProps> = () => {
                                 }}
                                 onClick={() => {
                                     selectDay(dayToNumber(day));
-                                    document
-                                        .getElementsByClassName(day)
-                                        .item(0)
-                                        ?.scrollIntoView({
-                                            behavior: "smooth",
-                                        });
                                 }}
                             >
                                 {day}
