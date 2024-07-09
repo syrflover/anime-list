@@ -120,8 +120,14 @@ const IndexPage: React.FC<PageProps> = () => {
     return (
         <main style={pageStyles}>
             <h1 style={headingStyles}>
-                <span style={headingAccentStyles}>syr</span>
-                's Anime List
+                <a
+                    style={{ color: "#232129" }}
+                    href="https://myanimelist.net/animelist/syrlee"
+                    target="_blank"
+                >
+                    <span style={headingAccentStyles}>syr</span>
+                    's Anime List
+                </a>
             </h1>
 
             <div
@@ -170,7 +176,15 @@ const IndexPage: React.FC<PageProps> = () => {
                                             : badgeStyles.backgroundColor,
                                 }}
                                 onClick={() => {
-                                    selectDay(dayToNumber(day));
+                                    const dayNumber = dayToNumber(day);
+
+                                    if (dayNumber === selectedDay) {
+                                        selectDay(-1);
+                                    }
+
+                                    setTimeout(() => {
+                                        selectDay(dayNumber);
+                                    });
                                 }}
                             >
                                 {day}
