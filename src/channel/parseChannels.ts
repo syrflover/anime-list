@@ -1,6 +1,14 @@
 import * as YAML from "yaml";
 import { Channel } from ".";
 
+type Key = keyof Channel["rules"][0];
+
+const keys: Key[] = ["quarter", "day", "time", "translator", "anissiaUrl"];
+
+function hasEveryKeys(rule: Channel["rules"][0]) {
+    return keys.every((key) => rule[key]?.length > 0);
+}
+
 export function parseChannels(text: string) {
     const channels: Channel[] = YAML.parse(text);
 
@@ -26,11 +34,7 @@ export function parseChannels(text: string) {
             rule = rules[currentIndex[1]];
         }
 
-        if (
-            ["quarter", "day", "time", "translator", "anissiaUrl"].every(
-                (key) => rule[key as keyof Channel["rules"][0]]?.length > 0
-            )
-        ) {
+        if (hasEveryKeys(rule)) {
             if (currentIndex[1] < rules.length - 1) {
                 currentIndex[1] += 1;
 
@@ -85,5 +89,10 @@ export function parseChannels(text: string) {
         }
     }
 
-    return channels;
+    return channels
+        .map((channel) => ({
+            ...channel,
+            rules: channel.rules.filter((rule) => hasEveryKeys(rule)),
+        }))
+        .filter((channel) => channel.rules.length > 0);
 }
