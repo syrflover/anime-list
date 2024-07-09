@@ -22,21 +22,21 @@ export function parseChannels(text: string) {
     let currentQuarter = "";
     let currentIndex = [0, 0];
 
-    let ignore = false;
+    let ignoreSection = false;
 
     for (let line of lines) {
         let rules = channels[currentIndex[0]].rules;
         let rule = rules[currentIndex[1]];
 
         if (line.startsWith("# *")) {
-            ignore = !ignore;
-            console.log(ignore);
+            ignoreSection = !ignoreSection;
+            console.log(ignoreSection);
         }
 
         // next
         if (
             currentIndex[1] > rules.length - 1 ||
-            (ignore && line.startsWith("- url:"))
+            (ignoreSection && line.startsWith("- url:"))
         ) {
             currentIndex[0] += 1;
             currentIndex[1] = 0;
