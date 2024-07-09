@@ -22,11 +22,22 @@ export function parseChannels(text: string) {
     let currentQuarter = "";
     let currentIndex = [0, 0];
 
+    let ignore = false;
+
     for (let line of lines) {
         let rules = channels[currentIndex[0]].rules;
         let rule = rules[currentIndex[1]];
 
-        if (currentIndex[1] > rules.length - 1) {
+        if (line.startsWith("# *")) {
+            ignore = !ignore;
+            console.log(ignore);
+        }
+
+        // next
+        if (
+            currentIndex[1] > rules.length - 1 ||
+            (ignore && line.startsWith("- url:"))
+        ) {
             currentIndex[0] += 1;
             currentIndex[1] = 0;
 
@@ -92,7 +103,7 @@ export function parseChannels(text: string) {
     return channels
         .map((channel) => ({
             ...channel,
-            rules: channel.rules.filter((rule) => hasEveryKeys(rule)),
+            rules: channel.rules.filter(hasEveryKeys),
         }))
         .filter((channel) => channel.rules.length > 0);
 }
